@@ -1,0 +1,94 @@
+<html>
+	<head>
+	    <meta charset="utf-8">
+	    <title>Simple Joiner</title>	    
+	    <script src="simplepeer.min.js"></script>
+
+	    <script>
+		//var Peer = require('simple-peer')
+		var Peer = SimplePeer;
+		var p = new Peer({ initiator: false, trickle: false })
+
+		p.on('error', function (err) { console.log('error', err) })
+
+		// signal the other peer
+		p.on('signal', function (data) {
+		  console.log('SIGNAL', JSON.stringify(data))
+		  
+		  // show the data on the page
+		  document.querySelector('#outgoing').textContent = JSON.stringify(data)
+		})
+
+		//document.querySelector('form').addEventListener('submit', function (ev) {
+		//  ev.preventDefault()
+		//  p.signal(JSON.parse(document.querySelector('#incoming').value))
+		//})
+
+		// send something
+		p.on('connect', function () {
+		  console.log('CONNECT')
+		  p.send('CONNECTED')
+		  //p.send('whatever' + Math.random())
+		})
+
+		// receive something
+		p.on('data', function (data) {
+		  console.log('data: ' + data)
+		  document.getElementById('receivedMsg').value += data + '\n'		  
+		})
+		
+		
+		function signalPeer() { 
+			  //document.querySelector('#form').addEventListener('submit', function (ev) {
+		      //window.preventDefault()
+		      p.signal( JSON.parse( document.getElementById('incoming').value ) )
+		//})
+		
+	    }
+		
+		function sendMessage() {
+			p.send( document.getElementById('messageTextBox').value )
+		}		
+		
+	    </script>
+	    
+	</head>
+	
+	
+  <body>
+    <h3 style="color: green">You are the Participant/Joiner of this WebRTC link!</h3>
+    [STEP 2] Paste the "offer" when you receive from the person who initiated the link... <br>
+
+    <textarea id="incoming" cols=110 rows=8 style="color: red; background-color: #FFEEEE; margin: 10px"></textarea><br>
+    <button type="submit" onclick="signalPeer()">Accept the offer (send signal)...</button>
+
+	<hr>
+
+    <div style="width: 700px; background-color: #77FF77">
+		[STEP 3] An "answer" (*signal*) will appear below when you accept an "offer"...<br>
+		Copy it and send back to the person who created the link...<br>
+		
+	</div>
+    <textarea id="outgoing" cols=110 rows= 8 style="color: green; background-color: #EEFFEE; margin: 10px"></textarea>
+
+	<hr>
+	<br />
+	<br />
+	<br />
+	<div style="background-color: #AAEEEE">
+		<br />
+		<!-- The Send Message Button and Textbox -->
+		<input type="text" id="messageTextBox" placeholder="Type here" style="width: 300px">
+		<button type="submit" onclick="sendMessage()">Send message</button>
+		<br>
+		<hr>
+		Received Msg Here...
+		<br>
+		<textarea id='receivedMsg' cols=50 rows=5>
+		</textarea>
+		<br />
+		<br />
+	</div>
+	
+  </body>
+</html>
